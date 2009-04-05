@@ -29,14 +29,24 @@
 
 #include "hfs_format.h"
 
+static void *zero_block = NULL;
+
 void trim(int device, uint64_t start, uint64_t end) {
     uint64_t extent_size = end - start;
 #if 1
-    //ZERO data instead of trimming so we can test without trim firmware
-    void *zero_block = malloc(extent_size);
-    bzero(zero_block, extent_size);
-    pwrite(device, zero_block, extent_size, start);
-    free(zero_block);
+    if (!zero_block) {
+        void *zero_block = malloc(128 * 1024);
+        bzero(zero_block, 128 * 1024);
+    }
+
+    uint64_t current_displacement;
+
+    while (extent_size > 0) {
+        uint32_t zero_size = extent_size > 128 * 1024 ? 128 * 1024 : extent_size;
+        pwrite(device, zero_block, zero_size, start+current_displacement);
+        current_displacement += zero_size;
+        extent_size -= zero_size;
+    }
 #else
     ioctl(device, BLKDISCARD, start, extent_size);
 #endif
