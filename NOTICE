@@ -1,0 +1,9 @@
+hfs_trim
+Copyright 2009 Louis Gerbarg
+
+This product includes software developed by Louis Gerbarg and available
+under the Apache License 2.0.
+
+HFS format definitions is provided by hfs_format.c, which is open source
+software, written and copyright by Apple Computer, and avilable under the
+APSL 2.0.

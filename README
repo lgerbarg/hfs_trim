@@ -1,0 +1,1 @@
+Initial import, this might actually work but it has not been tested. It has been used lightly on Mac OS X systems in zeroing mode, but it has not been tested on Linux with a TRIM capable device. I will test it once I get my hands on such a device. DO NOT USE THIS UNLESS YOU UNDERSTAND WHAT IT IS DOING, DO NOT USE THIS UNLESS YOU HAVE BACKED UP YOUR DATA!!!!
