@@ -39,7 +39,7 @@ void trim(int device, uint64_t start, uint64_t end) {
         bzero(zero_block, 128 * 1024);
     }
 
-    uint64_t current_displacement;
+    uint64_t current_displacement = 0;
 
     while (extent_size > 0) {
         uint32_t zero_size = extent_size > 128 * 1024 ? 128 * 1024 : extent_size;
