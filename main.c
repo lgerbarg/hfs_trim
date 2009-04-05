@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
                exit(-3);
            }
       } else {
-           printf("Could not read embedded volume info, aborting");
+           printf("Could not read embedded volume info, aborting\n");
            exit(-2);
       }
    } else {
