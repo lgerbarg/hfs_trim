@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
          if (first_unused_block) {
              //These are HFS blocks, not disk blocks or flash blocks
              printf("TRIM from %lu TO %lu\n", first_unused_block, i-1);
-             trim(raw_fs, volumeOffset + first_unused_block*blockSize, volumeOffset + (i-1)*blockSize);
+             trim(raw_fs, volumeOffset + first_unused_block*blockSize, volumeOffset + i*blockSize - 1);
         }
         first_unused_block = 0;
      }
