@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
        uint32_t startBlock = ntohl(vh.allocationFile.extents[i].startBlock);
        uint32_t blockCount = ntohl(vh.allocationFile.extents[i].blockCount);
 
-       printf("\tExtent %u: %lu at %lu\n", i, startBlock, blockCount);
+       printf("\tExtent %u: %lu at %lu\n", i, blockCount, startBlock);
        ssize_t read_count = pread(raw_fs, allocationFileData + currentBlockDisplacement*blockSize, blockCount*blockSize, volumeOffset + startBlock*blockSize);
 
        if (read_count == -1) {
@@ -140,6 +140,7 @@ int main(int argc, char **argv) {
    }
 
    uint32_t first_unused_block = 0;
+   uint64_t trim_count = 0;
 
    for(i = 0; i < totalBlocks; i++) {
       uint8_t bit = i%8;
@@ -153,12 +154,14 @@ int main(int argc, char **argv) {
       } else {
          if (first_unused_block) {
              //These are HFS blocks, not disk blocks or flash blocks
-             printf("TRIM from %lu TO %lu\n", first_unused_block, i-1);
              trim(raw_fs, volumeOffset + first_unused_block*blockSize, volumeOffset + i*blockSize);
+             trim_count = trim_count + (i-first_unused_block) * blockSize;
         }
         first_unused_block = 0;
      }
    }
+
+   printf("Trimmed %llu bytes\n", trim_count);
 
    free(allocationFileData);
 
