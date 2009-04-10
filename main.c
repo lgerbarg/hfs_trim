@@ -111,7 +111,13 @@ int main(int argc, char **argv) {
        exit(-2);
    }
 
-   //FIXME check to make sure the volume was unmounted cleanly, and warn to fsck if not
+   uint32_t attributes =  ntohl(vh.attributes);
+
+   if ((attributes & kHFSVolumeInconsistentMask)
+       || (attributes & kHFSVolumeInconsistentMask)) {
+       printf("Volume is dirty fsck before trimming");
+       exit(-5);
+   }
 
    uint32_t i;
    uint32_t blockSize = ntohl(vh.blockSize);
