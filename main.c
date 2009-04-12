@@ -60,10 +60,21 @@ int main(int argc, char **argv) {
        exit(-1);
    }
 
-   //FIXME test to make sure we have a raw device
-
    int raw_fs = open(argv[1], O_RDWR);
-   pread(raw_fs, &vh, sizeof(vh), 1024);
+
+   if (raw_fs == -1) {
+       printf("Error (%d) occured, aborting\n", errno);
+       exit(-7);
+   }
+
+
+   ssize_t read_size = pread(raw_fs, &vh, sizeof(vh), 1024);
+
+   if (read_size == -1) {
+       printf("Error (%d) occured, aborting\n", errno);
+       exit(-6);
+   }
+
    uint16_t sig = ntohs(vh.signature);
    uint16_t version = ntohs(vh.version);
    uint32_t volumeOffset = 0;
