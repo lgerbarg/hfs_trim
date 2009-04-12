@@ -169,8 +169,8 @@ int main(int argc, char **argv) {
       } else {
          if (first_unused_block) {
              //These are HFS blocks, not disk blocks or flash blocks
-             trim(raw_fs, volumeOffset + first_unused_block*blockSize, volumeOffset + i*blockSize);
-             trim_count = trim_count + (i-first_unused_block) * blockSize;
+             trim(raw_fs, (uint64_t)volumeOffset + (uint64_t)first_unused_block*(uint64_t)blockSize, (uint64_t)volumeOffset + (uint64_t)i*(uint64_t)blockSize);
+             trim_count = trim_count + ((uint64_t)i-(uint64_t)first_unused_block) * blockSize;
         }
         first_unused_block = 0;
      }
