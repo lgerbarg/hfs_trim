@@ -94,9 +94,7 @@ int main(int argc, char **argv) {
    } else if (sig == kHFSSigWord) {
        printf("HFS volume detected\n");
        HFSMasterDirectoryBlock *mdb = (HFSMasterDirectoryBlock *) (&vh);
-       uint16_t embeddedSig = ntohs(mdb->drEmbedSigWord);
        volumeOffset = 512*ntohs(mdb->drAlBlSt) + (ntohs(mdb->drEmbedExtent.startBlock) * ntohl(mdb->drAlBlkSiz));
-       printf("L: %lu\n", volumeOffset);
        pread(raw_fs, &vh, sizeof(vh), volumeOffset+1024);
        sig = ntohs(vh.signature);
        version = ntohs(vh.version);
