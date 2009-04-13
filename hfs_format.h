@@ -29,7 +29,6 @@
 #define __HFS_FORMAT__
 
 #include <sys/types.h>
-#include <sys/appleapiopts.h>
 
 /*
  * hfs_format.c
