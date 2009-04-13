@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include <sys/types.h>
 #include <sys/uio.h>
@@ -136,15 +137,15 @@ int main(int argc, char **argv) {
 
    uint32_t currentBlockDisplacement = 0;
 
-   printf("Block size: %lu\n", blockSize);
-   printf("Total blocks: %lu\n", totalBlocks);
+   printf("Block size: %"PRIu32"\n", blockSize);
+   printf("Total blocks: %"PRIu32"\n", totalBlocks);
 
-   printf("Allocation File Size: %lu\n", allocationFileSize);
+   printf("Allocation File Size: %"PRIu32"\n", allocationFileSize);
    for (i = 0; i < 8; i++) {
        uint32_t startBlock = ntohl(vh.allocationFile.extents[i].startBlock);
        uint32_t blockCount = ntohl(vh.allocationFile.extents[i].blockCount);
 
-       printf("\tExtent %u: %lu at %lu\n", i, blockCount, startBlock);
+       printf("\tExtent %"PRIu32": %"PRIu32" at %"PRIu32"\n", i, blockCount, startBlock);
        ssize_t read_count = pread(raw_fs, allocationFileData + currentBlockDisplacement*blockSize, blockCount*blockSize, volumeOffset + startBlock*blockSize);
 
        if (read_count == -1) {
@@ -176,7 +177,7 @@ int main(int argc, char **argv) {
      }
    }
 
-   printf("Trimmed %llu bytes\n", trim_count);
+   printf("Trimmed %"PRIu64" bytes\n", trim_count);
 
    free(allocationFileData);
 
