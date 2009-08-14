@@ -34,7 +34,7 @@
 void trim(int device, uint64_t start, uint64_t end) {
     uint64_t extent_size = end - start;
 #if 1
-    printf("\t%" PRIu64 ":%" PRIu64 "\n", extent_size/512, start/512);
+    printf("\t%" PRIu64 ":%" PRIu64 "\n", start/512, extent_size/512);
 #else
     ioctl(device, BLKDISCARD, start, extent_size);
 #endif
