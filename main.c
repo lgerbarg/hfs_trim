@@ -30,24 +30,11 @@
 
 #include "hfs_format.h"
 
-static void *zero_block = NULL;
 
 void trim(int device, uint64_t start, uint64_t end) {
     uint64_t extent_size = end - start;
 #if 1
-    if (!zero_block) {
-        void *zero_block = malloc(128 * 1024);
-        bzero(zero_block, 128 * 1024);
-    }
-
-    uint64_t current_displacement = 0;
-
-    while (extent_size > 0) {
-        uint32_t zero_size = extent_size > 128 * 1024 ? 128 * 1024 : extent_size;
-        pwrite(device, zero_block, zero_size, start+current_displacement);
-        current_displacement += zero_size;
-        extent_size -= zero_size;
-    }
+    printf("\t%" PRIu64 ":%" PRIu64 "\n", extent_size/512, start/512);
 #else
     ioctl(device, BLKDISCARD, start, extent_size);
 #endif
@@ -61,7 +48,7 @@ int main(int argc, char **argv) {
        exit(-1);
    }
 
-   int raw_fs = open(argv[1], O_RDWR);
+   int raw_fs = open(argv[1], O_RDONLY);
 
    if (raw_fs == -1) {
        printf("Error (%d) occured, aborting\n", errno);
@@ -117,7 +104,7 @@ int main(int argc, char **argv) {
            exit(-2);
       }
    } else {
-       printf("Could not read volume info, aborting");
+       printf("Could not read volume info, aborting\n");
        exit(-2);
    }
 
@@ -140,12 +127,12 @@ int main(int argc, char **argv) {
    printf("Block size: %"PRIu32"\n", blockSize);
    printf("Total blocks: %"PRIu32"\n", totalBlocks);
 
-   printf("Allocation File Size: %"PRIu32"\n", allocationFileSize);
+//   printf("Allocation File Size: %"PRIu32"\n", allocationFileSize);
    for (i = 0; i < 8; i++) {
        uint32_t startBlock = ntohl(vh.allocationFile.extents[i].startBlock);
        uint32_t blockCount = ntohl(vh.allocationFile.extents[i].blockCount);
 
-       printf("\tExtent %"PRIu32": %"PRIu32" at %"PRIu32"\n", i, blockCount, startBlock);
+//       printf("\tExtent %"PRIu32": %"PRIu32" at %"PRIu32"\n", i, blockCount, startBlock);
        ssize_t read_count = pread(raw_fs, allocationFileData + currentBlockDisplacement*blockSize, blockCount*blockSize, volumeOffset + startBlock*blockSize);
 
        if (read_count == -1) {
@@ -157,6 +144,9 @@ int main(int argc, char **argv) {
 
    uint32_t first_unused_block = 0;
    uint64_t trim_count = 0;
+
+   printf("Free extents (512 byte sectors):\n");
+   printf("\tStart:Length\n");
 
    for(i = 0; i < totalBlocks; i++) {
       uint8_t bit = i%8;
