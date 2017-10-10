@@ -1,0 +1,6 @@
+# .gitignore
+
+hfs_trim
+*.o
+
+# vim: set syn=config:
