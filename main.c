@@ -16,6 +16,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 #include <strings.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -25,19 +27,35 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/ioctl.h>
+#include <arpa/inet.h>
+
+#if defined(IS_LINUX) && IS_LINUX
+# include <linux/fs.h>
+#endif
 
 #include <fcntl.h>
 
 #include "hfs_format.h"
 
+#if !defined(IS_LINUX) || !IS_LINUX
+# define NOACT 1
+#endif
 
 void trim(int device, uint64_t start, uint64_t end) {
     uint64_t extent_size = end - start;
-#if 1
-    printf("\t%" PRIu64 ":%" PRIu64 "\n", start/512, extent_size/512);
+    errno = 0;
+    int err = 0;
+#if defined(IS_LINUX) && IS_LINUX
+    uint64_t range[] = { start, extent_size };
+    err = ioctl(device, BLKDISCARD, &range);
 #else
-    ioctl(device, BLKDISCARD, start, extent_size);
+# warning "Unknown kernel: cannot make ioctl syscall, just printing extents ..."
+    printf("\t%" PRIu64 ":%" PRIu64 "\n", start/512, extent_size/512);
 #endif
+    if (err) {
+      printf ("failed: %s\n", strerror (errno));
+      errno = 0;
+    }
 }
 
 int main(int argc, char **argv) {
@@ -48,7 +66,12 @@ int main(int argc, char **argv) {
        exit(-1);
    }
 
-   int raw_fs = open(argv[1], O_RDONLY);
+   int raw_fs;
+#if defined(NOACT) && NOACT
+   raw_fs = open(argv[1], O_RDONLY);
+#else
+   raw_fs = open(argv[1], O_RDWR);
+#endif
 
    if (raw_fs == -1) {
        printf("Error (%d) occured, aborting\n", errno);
