@@ -9,4 +9,4 @@ clean:
 	rm hfs_trim *.o
 
 .c.o:
-	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ -c $<
+	${CC} -DIS_$$(uname | tr '[:lower:]' '[:upper:]')=1 ${CFLAGS} ${CPPFLAGS} -o $@ -c $<
